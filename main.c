@@ -45,7 +45,7 @@ void animateDrop(int speed);
 void contar(void);
 void programarTiempo(void);
 void check4Buttons(void);
-void heatingstatus(void);
+void heatingstatus(double temp);
 
 
 char y = 0;
@@ -68,7 +68,7 @@ char HiLo;
 #define _XTAL_FREQ 8000000      // PIC18F4550 internal oscillator frequency
 
 #define PWM_FREQ 2500            // PWM frequency in Hz
-#define DESIRED_TEMP 37         // Default desired temperature
+#define DESIRED_TEMP 37     // Default desired temperature
 #define SENSOR 0
 #define DEGREE 223
 int lec1;
@@ -92,7 +92,7 @@ void main(void) {
         lec1 = analogRead(SENSOR);
         volts = 5.0*lec1/1023.0;
         temp = volts*10;
-        heatingstatus();
+        heatingstatus(temp);
         MoveCursor(0,LINE_DOWN); //*
         LCDint(temp);
         LCDchar('.');
@@ -108,44 +108,23 @@ void main(void) {
     return;
 }
     
-void heatingstatus(){
-    lec1 = analogRead(0);
-    if (lec1<25){
-    GREEN = LOW; //blue
-    BLUE = HI;
-        RED = LOW;
-    }else if (lec1<35){
-        GREEN = HI; //green
+
+void heatingstatus(double temp) {
+    if (temp < DESIRED_TEMP - 3) {
+        RED = LOW; //blue
+        GREEN = LOW;
+        BLUE = HI;
+    } else if (temp < DESIRED_TEMP +1) {
+        RED = LOW; //green
+        GREEN = HI;
         BLUE = LOW;
-        RED = LOW;
-    }else if (lec1<50){
+    } else if (temp < DESIRED_TEMP + 3) {
+        RED = HI; // yellow
+        GREEN = HI;
+        BLUE = LOW;
+    } else {
+        RED = HI; // red
         GREEN = LOW;
         BLUE = LOW;
-        RED = HI;
     }
 }
-    
-//    while(1){
-// 
-//    GREEN = LOW; //blue
-//    BLUE = HI;
-//    RED = LOW;
-//    __delay_ms(500);
-//    GREEN = HI; //cyan
-//    BLUE = HI;
-//    RED = LOW;
-//    __delay_ms(500); //green
-//    GREEN = HI;
-//    BLUE = LOW;
-//    RED = LOW;
-//    __delay_ms(500); //yellow
-//    GREEN = HI;
-//    BLUE = LOW;
-//    RED = HI;
-//    __delay_ms(500); //red
-//    GREEN = LOW;
-//    BLUE = LOW;
-//    RED = HI;
-//    __delay_ms(500);
-//    }
-   
