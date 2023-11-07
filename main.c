@@ -46,6 +46,7 @@ void contar(void);
 void programarTiempo(void);
 void check4Buttons(void);
 void heatingstatus(double temp);
+void updateLCD (double t);
 
 
 char y = 0;
@@ -83,7 +84,7 @@ void main(void) {
     GREEN_pin = OUT;
     RED_pin = OUT;
     unsigned int lect1;
-    lec1 = analogRead(0);
+    //lec1 = analogRead(0);
     unsigned int lec1;
     double volts;
     double temp;
@@ -91,18 +92,9 @@ void main(void) {
     while(1){
         lec1 = analogRead(SENSOR);
         volts = 5.0*lec1/1023.0;
-        temp = volts*10;
+        temp = volts*10.018-0.15;
         heatingstatus(temp);
-        MoveCursor(0,LINE_DOWN); //*
-        LCDint(temp);
-        LCDchar('.');
-        temp = temp-(int)temp;
-        temp*=100;
-        LCDint(temp);
-        LCDchar('.');
-        LCDchar(DEGREE);
-        LCDchar('C');
-        LCDprint(5,"     ",0); //*
+        updateLCD(temp);
         __delay_ms(500);
     }
     return;
@@ -110,7 +102,7 @@ void main(void) {
     
 
 void heatingstatus(double temp) {
-    if (temp < DESIRED_TEMP - 3) {
+    if (temp < DESIRED_TEMP - 2) {
         RED = LOW; //blue
         GREEN = LOW;
         BLUE = HI;
@@ -127,4 +119,32 @@ void heatingstatus(double temp) {
         GREEN = LOW;
         BLUE = LOW;
     }
+}
+
+void updateLCD (double temp) {
+    double decimals;
+    MoveCursor (0, LINE_DOWN);
+    LCDint(temp);
+    LCDchar('.');
+    decimals=temp-(int)temp;
+    decimals*=100;
+    if (decimals<10){
+        LCDchar('0');
+    }
+    LCDint(decimals);
+    LCDchar('  ');
+    LCDchar(DEGREE);
+    LCDchar('C');
+    LCDchar('   ');
+    if (temp<35){
+        LCDprint(8,"COLD      ",0);
+    }else if (temp<37.5){
+        LCDprint(8,"NORMAL      ",0);
+    }else if (temp<40){
+        LCDprint(8,"WARM      ",0);
+    }
+    else{
+        LCDprint(8,"HOT      ",0);
+    }
+        
 }
